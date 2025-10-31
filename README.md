@@ -15,7 +15,7 @@
 6. Created a SNS Topic and subscribed to it 
 7. Added the SNS Topic to the Environmental Variable
 8. Used AI to adapt my PythonCode for getting the File and Counting words 
-9. Tested the Lambda Function by uploading a .txt-file to 
+9. Tested the Lambda Function by uploading a .txt-file to S3
 10. Had to troubleshoot because of timeout -> set timeout to 15s
 11. Uploaded again
 10. Got an E-Mail ☑️
