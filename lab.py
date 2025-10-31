@@ -1,25 +1,44 @@
+import boto3
+import json
+import os
 
+def lambda_handler(event, context):
+    s3 = boto3.client('s3')
+    sns = boto3.client('sns')
 
-#open a file
-#read it
+    # Get SNS topic ARN from environment variable
+    topic_arn = os.environ['SNS_TOPIC_ARN']
 
-#use something to count the words.
+    # Extract bucket and file name from the event
+    record = event['Records'][0]
+    bucket_name = record['s3']['bucket']['name']
+    file_key = record['s3']['object']['key']
 
-#trigger when uploading to s3
-#txt file upload to s3 and get an email with "file xyz has xy words"
+    # Download the file from S3 to the /tmp directory
+    local_path = f"/tmp/{os.path.basename(file_key)}"
+    s3.download_file(bucket_name, file_key, local_path)
 
+    # Counting the words
+    def wordcount(textfile):
+        c = 0
+        with open(textfile, 'r') as file:
+            data = file.read()
+            w = data.split()
+            c += len(w)
+        return c
 
-def wordcount(textfile):
-    # set wordcount to 0 from start
-    c = 0
-    # Opening file in read only mode
-    with open(textfile, 'r') as file:
-        data = file.read()
-        w = data.split()
-        c += len(w)
-    print(c)
+    # Run wordcount on the local file
+    count = wordcount(local_path)
 
-# Testfile is in same folder
-text = 'testtext.txt'
+    # Prepare and send the SNS message
+    message = f"The file '{file_key}' in bucket '{bucket_name}' contains {count} words."
+    sns.publish(
+        TopicArn=topic_arn,
+        Subject="Wordcount Report",
+        Message=message
+    )
 
-wordcount(text)
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'message': message})
+    }
