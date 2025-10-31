@@ -8,4 +8,7 @@
 3. Create an Amazon Simple Notification Service (Amazon SNS) topic to report the word count in an email.
 
 ### Steps
+1. Opened AWS and created an S3 Bucket.
+2. Created a Lambda Function with Full S3 Access Role.
+3. Wrote the PythonCode to count words in a file.
 
