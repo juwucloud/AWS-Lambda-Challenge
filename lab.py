@@ -2,6 +2,16 @@ import boto3
 import json
 import os
 
+# Defining word count function! 
+def wordcount(textfile):
+    c = 0
+    with open(textfile, 'r') as file:
+        data = file.read()
+        w = data.split()
+        c += len(w)
+    return c
+
+
 def lambda_handler(event, context):
     s3 = boto3.client('s3')
     sns = boto3.client('sns')
@@ -17,15 +27,6 @@ def lambda_handler(event, context):
     # Download the file from S3 to the /tmp directory
     local_path = f"/tmp/{os.path.basename(file_key)}"
     s3.download_file(bucket_name, file_key, local_path)
-
-    # Counting the words
-    def wordcount(textfile):
-        c = 0
-        with open(textfile, 'r') as file:
-            data = file.read()
-            w = data.split()
-            c += len(w)
-        return c
 
     # Run wordcount on the local file
     count = wordcount(local_path)
